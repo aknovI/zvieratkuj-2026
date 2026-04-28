@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  pets      Pet[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pet {
+  id           String        @id @default(cuid())
+  name         String
+  species      String
+  breed        String?
+  dateOfBirth  DateTime?
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id])
+  vaccinations Vaccination[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Vaccination {
+  id          String   @id @default(cuid())
+  petId       String
+  pet         Pet      @relation(fields: [petId], references: [id])
+  name        String
+  dueDate     DateTime
+  completedAt DateTime?
+  notes       String?
+  emailSent   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FoodProduct {
+  id        String      @id @default(cuid())
+  name      String
+  brand     String
+  animal    String
+  weightKg  Float?
+  prices    FoodPrice[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Shop {
+  id        String      @id @default(cuid())
+  name      String
+  website   String?
+  prices    FoodPrice[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model FoodPrice {
+  id        String      @id @default(cuid())
+  productId String
+  shopId    String
+  product   FoodProduct @relation(fields: [productId], references: [id])
+  shop      Shop        @relation(fields: [shopId], references: [id])
+  price     Decimal
+  url       String?
+  checkedAt DateTime    @default(now())
+}
